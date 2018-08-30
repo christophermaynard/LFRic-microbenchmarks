@@ -15,7 +15,7 @@ https://www.metoffice.gov.uk/research/modelling-systems/lfric
 The main LFRic code repository can be found at the following URL:
 https://code.metoffice.gov.uk/trac/lfric
 
-Each benchmark consists of an individual kernel, a driver, data file and Makefile
+Each benchmark consists of an individual kernel, a driver, data file and Makefile.
 A handful of necessary LFRic infrastructure code is in the common directory.
 Contact email christopher.maynard@metoffice.gov.uk
 
