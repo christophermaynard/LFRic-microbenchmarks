@@ -97,6 +97,9 @@ int main(){
       matrix_vector_code(cmap[i][j], nlayers, data1, data2, ncell_3d, op_data, ndf1, undf1, map1, ndf2, undf2, map2);
     }
   }
+  for(i=0;i<undf1;i++){
+    printf("%d %.16e %.16e\n",i, data1[i],answer[i]);
+  }
   
   /* Free the crispy bits */
   dino_close(&dino);
