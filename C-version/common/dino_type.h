@@ -26,4 +26,7 @@ void input_scalar(dino_type *dino, int *scalar);
 void input_1d_int(dino_type *dino, int *array, int dim);
 void input_2d_int(dino_type *dino, int **array, int dim1, int dim2);
 
+void input_1d_double(dino_type *dino, double *array, int dim);
+void input_3d_double(dino_type *dino, double ***array, int dim1, int dim2, int dim3);
+
 #endif    

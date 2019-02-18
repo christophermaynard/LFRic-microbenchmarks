@@ -45,3 +45,26 @@ void input_2d_int(dino_type *dino, int **array, int dim1, int dim2){
   }
   return;
 }
+
+void input_1d_double(dino_type *dino, double *array, int dim){
+  int i;
+  for(i = 0; i<dim; i++){
+    fscanf(dino->fp,"%d",&array[i]);
+  }
+  return;
+}
+
+void input_3d_double(dino_type *dino, double ***array, int dim1, int dim2, int dim3){
+  int i,j,k;
+  int scalar;
+  for(i = 0; i < dim1; i++){
+    for(j = 0; j < dim2; j++){
+      for(k = 0; k < dim3; k++){
+	fscanf(dino->fp,"%d",&array[i][j][k]);
+      }
+    }
+  }
+  return;
+}
+
+  
