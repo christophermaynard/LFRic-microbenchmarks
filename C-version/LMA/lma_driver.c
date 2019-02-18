@@ -5,7 +5,7 @@
  *----------------------------------------------------------------------------- 
  */
 #include "dino_type.h"
-
+#include "matrix_vector_kernel.h"
 int main(){
 
   /* The file reader */
@@ -33,6 +33,7 @@ int main(){
 
   /* scalar loop tempories */
   int i,j;
+  int cell;
   
   /* Open the file */
   dino_open(&dino);
@@ -90,6 +91,12 @@ int main(){
   input_1d_double(&dino, data2, undf2);
   input_1d_double(&dino, answer, undf1);
   printf("eaten the data\n");
+
+  for(i = 0; i < ncolours; i++){
+    for(j = 0; j < ncells_per_colour[i]; j++){
+      matrix_vector_code(cmap[i][j], nlayers, data1, data2, ncell_3d, op_data, ndf1, undf1, map1, ndf2, undf2, map2);
+    }
+  }
   
   /* Free the crispy bits */
   dino_close(&dino);

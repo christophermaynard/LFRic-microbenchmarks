@@ -1,4 +1,4 @@
-CC=pgcc
+CC=gcc-7
 IPATH=../common
 VPATH=$(IPATH):.
 
@@ -18,8 +18,8 @@ all : lma_driver
 clean:
 	rm *.o lma_driver 
 
-
 # dependencies
 dino_type.o: dino_type.h
-lma_driver.o: dino_type.h
-lma_driver: lma_driver.o dino_type.o
+lma_driver.o: dino_type.h matrix_vector_kernel.h
+matrix_vector_kernel.o: matrix_vector_kernel.h
+lma_driver: lma_driver.o dino_type.o matrix_vector_kernel.o
