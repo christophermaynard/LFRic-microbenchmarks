@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
+
 
 #define MAX_FILE_LEN 128
 

@@ -39,7 +39,7 @@ int main(){
   dino_open(&dino);
   
   /* Read the mesh sizes */
-  input_scalar(&dino, &ncell);
+   input_scalar(&dino, &ncell);  
   input_scalar(&dino, &ncell_3d);
   input_scalar(&dino, &ncolours);  
   input_scalar(&dino, &nlayers);
@@ -61,7 +61,7 @@ int main(){
     map1[i] = (int *) malloc( ncell * sizeof(int) );
   }
   input_2d_int(&dino, map1, ndf1, ncell);
-
+  
   /* sizes and map for space 2 */
   input_scalar(&dino, &ndf2);
   input_scalar(&dino, &undf2);
@@ -90,16 +90,24 @@ int main(){
   input_1d_double(&dino, data1, undf1);
   input_1d_double(&dino, data2, undf2);
   input_1d_double(&dino, answer, undf1);
-  printf("eaten the data\n");
+  printf("Ingested the data\n");
 
   for(i = 0; i < ncolours; i++){
     for(j = 0; j < ncells_per_colour[i]; j++){
-      matrix_vector_code(cmap[i][j], nlayers, data1, data2, ncell_3d, op_data, ndf1, undf1, map1, ndf2, undf2, map2);
+      matrix_vector_code((cmap[i][j]-1), nlayers, data1, data2, ncell_3d, op_data, ndf1, undf1, map1, ndf2, undf2, map2);
     }
   }
-  for(i=0;i<undf1;i++){
-    printf("%d %.16e %.16e\n",i, data1[i],answer[i]);
-  }
+    
+
+
+  /* random check */
+  /*i = 56;
+  printf("%d %.16e %.16e\n",i, data1[i],answer[i]);
+  i = 57;
+  printf("%d %.16e %.16e\n",i, data1[i],answer[i]);
+  i = 58;
+  printf("%d %.16e %.16e\n",i, data1[i],answer[i]);  */
+
   
   /* Free the crispy bits */
   dino_close(&dino);

@@ -4,11 +4,11 @@
 #! should have received as part of this distribution.
 #!-----------------------------------------------------------------------------
 
-FC=ifort
-FFLAGS=-g -qopenmp -traceback
-#FFLAGS=-g 
-LDFLAGS=-g -qopenmp -traceback
-#LDFLAGS=-g
+FC=gfortran
+#FFLAGS=-g -qopenmp -traceback
+FFLAGS= 
+#LDFLAGS=-g -qopenmp -traceback
+LDFLAGS=
 
 VPATH=../common:.
 
