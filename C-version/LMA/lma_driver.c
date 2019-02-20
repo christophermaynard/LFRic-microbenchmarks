@@ -6,6 +6,8 @@
  */
 #include "dino_type.h"
 #include "matrix_vector_kernel.h"
+#include "array_alloc.h"
+
 int main(){
 
   /* The file reader */
@@ -39,51 +41,38 @@ int main(){
   dino_open(&dino);
   
   /* Read the mesh sizes */
-   input_scalar(&dino, &ncell);  
+  input_scalar(&dino, &ncell);  
   input_scalar(&dino, &ncell_3d);
   input_scalar(&dino, &ncolours);  
   input_scalar(&dino, &nlayers);
 
   /* colouring */
-  ncells_per_colour = (int *) malloc(ncolours*sizeof(int));
+  ncells_per_colour = ialloc_1d(ncolours);
   input_1d_int(&dino, ncells_per_colour, ncolours);
-  cmap = (int **) malloc( ncolours *sizeof(int *) );
-  for(i=0;i<ncolours; i++){
-    cmap[i] = (int *) malloc( ncells_per_colour[i]*sizeof(int));
-    }
+
+  cmap = ialloc_2d(ncolours, ncells_per_colour[0]);
   input_2d_int(&dino, cmap, ncolours, ncells_per_colour[0]);
 
   /* sizes and map for space 1 */
   input_scalar(&dino, &ndf1);
   input_scalar(&dino, &undf1);
-  map1 = (int **) malloc(ndf1 * sizeof(int *));
-  for(i = 0; i<ndf1; i++){
-    map1[i] = (int *) malloc( ncell * sizeof(int) );
-  }
+
+  map1 = ialloc_2d(ndf1, ncell);
   input_2d_int(&dino, map1, ndf1, ncell);
   
   /* sizes and map for space 2 */
   input_scalar(&dino, &ndf2);
   input_scalar(&dino, &undf2);
-  map2 = (int **) malloc(ndf2 * sizeof(int *));
-  for(i = 0; i<ndf2; i++){
-    map2[i] = (int *) malloc( ncell * sizeof(int) );
-  }
+
+  map2 = ialloc_2d(ndf2, ncell);
   input_2d_int(&dino, map2, ndf2, ncell);
 
   /* allocate data memory */
-  data1 = (double *) malloc( undf1 * sizeof(double) );
-  data2 = (double *) malloc( undf2 * sizeof(double) );
-  answer = (double *) malloc( undf1 * sizeof(double) );
-  op_data = (double ***) malloc( ndf1 * sizeof(double **));
-  for(i = 0; i<ndf1; i++){
-    op_data[i] = (double **) malloc( ndf2 * sizeof(double *) );
-  }
-  for(i = 0; i<ndf1; i++){
-    for(j = 0; j<ndf2; j++){
-      op_data[i][j] = (double *) malloc( ncell_3d * sizeof(double) );
-    }
-  }
+  data1 = dalloc_1d(undf1);
+  data2 = dalloc_1d(undf2);
+  answer = dalloc_1d(undf1);
+  
+  op_data = dalloc_3d( ndf1, ndf2, ncell_3d );
 
   /* now read, read, read */
   input_3d_double(&dino, op_data, ndf1, ndf2, ncell_3d);
@@ -101,12 +90,13 @@ int main(){
 
 
   /* random check */
-  /*i = 56;
+  i = 56;
   printf("%d %.16e %.16e\n",i, data1[i],answer[i]);
   i = 57;
   printf("%d %.16e %.16e\n",i, data1[i],answer[i]);
   i = 58;
-  printf("%d %.16e %.16e\n",i, data1[i],answer[i]);  */
+  printf("%d %.16e %.16e\n",i, data1[i],answer[i]);
+ 
 
   
   /* Free the crispy bits */
