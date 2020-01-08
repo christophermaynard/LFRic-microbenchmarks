@@ -81,12 +81,7 @@ int main(){
   input_1d_double(&dino, answer, undf1);
   printf("Ingested the data\n");
 
-#pragma omp target map(tofrom: data1[0:undf1)			    \
-	map(to: op_data[0:ndf1, 0:ndf2, 0:ncell_d], data2[0:undf2], \
-	    cmap[0:ncolours, 0:ncells_per_colour[0] ], map1[0:ndf1,0:ncell], \
-	    map2[0:ncf2,0:ncell] )
   for(i = 0; i < ncolours; i++){
-#pragma omp temas distribute parallel for
     for(j = 0; j < ncells_per_colour[i]; j++){
       matrix_vector_code((cmap[i][j]-1), nlayers, data1, data2, ncell_3d, op_data, ndf1, undf1, map1, ndf2, undf2, map2);
     }
