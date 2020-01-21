@@ -8,5 +8,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#pragma omp declare target
 void matrix_vector_code(int cell, int nlayers, double *lhs, double *x, int ncell_3d, double ***matrix, int ndf1, int undf, int **map1, int ndf2, int undf2, int **map2);
+#pragma omp end declare target
+
 #endif
