@@ -31,4 +31,5 @@ void input_2d_int(dino_type *dino, int **array, int dim1, int dim2);
 void input_1d_double(dino_type *dino, double *array, int dim);
 void input_3d_double(dino_type *dino, double ***array, int dim1, int dim2, int dim3);
 
+void input_3d_double_1D(dino_type *dino, double *array, int dim1, int dim2, int dim3);
 #endif    

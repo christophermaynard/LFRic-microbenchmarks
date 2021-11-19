@@ -60,11 +60,23 @@ void input_3d_double(dino_type *dino, double ***array, int dim1, int dim2, int d
   for(k = 0; k < dim3; k++){
     for(j = 0; j < dim2; j++){
       for(i = 0; i < dim1; i++){	
+	//printf("%d, %d, %d\n", k, j, i);
 	fscanf(dino->fp,"%le",&array[i][j][k]);
       }
     }
   }
   return;
 }
-
+void input_3d_double_1D(dino_type *dino, double *array, int dim1, int dim2, int dim3){
+	int i, j, k;
+	int scalar;
+	for(k = 0; k < dim3; k++){
+	   for(j = 0; j < dim2; j++){
+	      for(i = 0; i < dim1; i++){
+		fscanf(dino->fp, "%le", &array[( (i * dim2 * dim3) + (j * dim3 )+ k)]);
+	      }
+	   }
+	}
+	return;
+}
   

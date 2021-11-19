@@ -31,8 +31,8 @@ int main(){
 
   /* The data */
   double *data1, *data2, *answer;
-  double ***op_data;
-
+  
+  double *op_data_1D;
   /* scalar loop tempories */
   int i,j;
   int cell;
@@ -72,10 +72,10 @@ int main(){
   data2 = dalloc_1d(undf2);
   answer = dalloc_1d(undf1);
   
-  op_data = dalloc_3d( ndf1, ndf2, ncell_3d );
-
+  
+  op_data_1D = (double*)malloc( ndf1 * ndf2 * ncell_3d * sizeof(double));
   /* now read, read, read */
-  input_3d_double(&dino, op_data, ndf1, ndf2, ncell_3d);
+  input_3d_double_1D(&dino, op_data_1D, ndf1, ndf2, ncell_3d);
   input_1d_double(&dino, data1, undf1);
   input_1d_double(&dino, data2, undf2);
   input_1d_double(&dino, answer, undf1);
@@ -83,7 +83,7 @@ int main(){
 
   for(i = 0; i < ncolours; i++){
     for(j = 0; j < ncells_per_colour[i]; j++){
-      matrix_vector_code((cmap[i][j]-1), nlayers, data1, data2, ncell_3d, op_data, ndf1, undf1, map1, ndf2, undf2, map2);
+      matrix_vector_code_1D((cmap[i][j]-1), nlayers, data1, data2, ncell_3d, op_data_1D, ndf1, undf1, map1, ndf2, undf2, map2);
     }
   }
     
@@ -105,9 +105,14 @@ int main(){
   free(cmap);
   free(map1);
   free(map2);
-  free(op_data);
+  
+  free(op_data_1D);
+  
   free(data1);
   free(data2);
+
+  
   free(answer);
+  
   return 0;
 }

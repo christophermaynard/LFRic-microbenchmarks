@@ -5,11 +5,14 @@
 #!-----------------------------------------------------------------------------
 
 
-CC=gcc
+CC=clang
 IPATH=../common
 VPATH=$(IPATH):.
 
-CFLAGS=-I$(IPATH) -g
+
+CFLAGS=-I$(IPATH) -g -O3
+
+
 LDFLAGS=
 
 

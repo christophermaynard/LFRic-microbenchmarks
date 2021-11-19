@@ -9,4 +9,6 @@
 #include <stdio.h>
 
 void matrix_vector_code(int cell, int nlayers, double *lhs, double *x, int ncell_3d, double ***matrix, int ndf1, int undf, int **map1, int ndf2, int undf2, int **map2);
+
+void matrix_vector_code_1D(int cell, int nlayers, double* lh, double *x, int ncell_3d, double *matrix, int ndf1, int undf, int **map1, int ndf2, int undf2, int **map2);
 #endif
