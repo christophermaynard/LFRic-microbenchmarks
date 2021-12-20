@@ -48,13 +48,22 @@ void matrix_vector_code_1D(int cell, int nlayers, double* lhs, double *x, int nc
 			                  x[ map2[df2][cell] + kk + 2],
 			                  x[ map2[df2][cell] + kk + 3]
 		   };
-		   __m256d mat_vec = _mm256_set_pd(mat_values[0], mat_values[1], mat_values[2], mat_values[3]);
-		   __m256d x_vec = _mm256_set_pd(x_values[0], x_values[1], x_values[2], x_values[3]);
-		   __m256d lhs_vec;
-
-		   __mm256_fmadd_pd(mat_vec, x_vec, lhs_vec);
-		   lhs[map1[df1][cell] + kk] += _mm256_extract_pd(lhs, 0);
 		   
+		   __m256d mat_vec = _mm256_set_pd(mat_values[0], mat_values[1], mat_values[2], mat_values[3]);
+                   __m256d x_vec = _mm256_set_pd(x_values[0], x_values[1], x_values[2], x_values[3]);
+
+                   double lhs_values[4] = { lhs[map1[df1][cell] + kk],
+                                            lhs[map1[df1][cell] + kk + 1],
+                                            lhs[map1[df1][cell] + kk + 2],
+                                            lhs[map1[df1][cell] + kk + 3],
+                   };
+                   __m256d results_vec;
+
+                   __m256d lhs_vec = _mm256_set_pd(lhs_values[0], lhs_values[1], lhs_values[2], lhs_values[3]);
+
+                   results_vec = _mm256_fmadd_pd(mat_vec, x_vec, lhs_vec);
+
+	   
 
 		}
 	      }
