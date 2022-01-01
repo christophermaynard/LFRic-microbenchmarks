@@ -5,12 +5,12 @@
 #!-----------------------------------------------------------------------------
 
 
-CC=clang
+CC=icc
 IPATH=../common
 VPATH=$(IPATH):.
 
 
-CFLAGS=-I$(IPATH) -g -O3 -maxv512f
+CFLAGS=-I$(IPATH) -g -O3 -mavx
 
 
 LDFLAGS=
