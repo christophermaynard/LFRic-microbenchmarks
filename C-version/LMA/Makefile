@@ -10,7 +10,7 @@ IPATH=../common
 VPATH=$(IPATH):.
 
 
-CFLAGS=-I$(IPATH) -g -O3
+CFLAGS=-I$(IPATH) -g -O3 -march=cascadelake
 
 
 LDFLAGS=
