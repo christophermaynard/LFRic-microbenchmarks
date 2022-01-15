@@ -47,7 +47,7 @@ oid matrix_vector_code_1D(int cell, int nlayers, double* lhs, double *x, int nce
                                             matrix[(df1 * ndf2 * ncell_3d) + (df2 * ncell_3d) + ik + 7]
                    };
 
-                   double x_values[4] = { x[ map2[df2][cell] + kk],
+                   double x_values[8] = { x[ map2[df2][cell] + kk],
                                           x[ map2[df2][cell] + kk + 1],
                                           x[ map2[df2][cell] + kk + 2],
                                           x[ map2[df2][cell] + kk + 3],
@@ -57,7 +57,7 @@ oid matrix_vector_code_1D(int cell, int nlayers, double* lhs, double *x, int nce
                                           x[ map2[df2][cell] + kk + 7]
 
                    };
-                  double lhs_values[4] = { lhs[ map1[df1][cell] + kk ],
+                  double lhs_values[8] = { lhs[ map1[df1][cell] + kk ],
                                           lhs[ map1[df1][cell] + kk  + 1],
                                           lhs[ map1[df1][cell] + kk  + 2],
                                           lhs[ map1[df1][cell] + kk  + 3],

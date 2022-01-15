@@ -10,7 +10,7 @@ IPATH=../common
 VPATH=$(IPATH):.
 
 
-CFLAGS=-I$(IPATH) -g -O3 -mavx
+CFLAGS=-I$(IPATH) -g -O3 -mavx -openmp
 
 
 LDFLAGS=
