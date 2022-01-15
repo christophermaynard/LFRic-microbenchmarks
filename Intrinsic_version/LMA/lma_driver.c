@@ -93,7 +93,7 @@ int main(){
   }
   end = omp_get_wtime();
 
-  prinft("%f\n", end - start);
+  printf("%f\n", end - start);
 
 
   /* random check */
