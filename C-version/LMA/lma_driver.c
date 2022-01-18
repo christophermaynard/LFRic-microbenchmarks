@@ -85,9 +85,11 @@ int main(){
   double start, end;
 
   start = omp_get_wtime();
-  for(i = 0; i < ncolours; i++){
-    for(j = 0; j < ncells_per_colour[i]; j++){
-      matrix_vector_code_1D((cmap[i][j]-1), nlayers, data1, data2, ncell_3d, op_data_1D, ndf1, undf1, map1, ndf2, undf2, map2);
+  for(int iter = 0; iter < 1000; iter++){
+    for(i = 0; i < ncolours; i++){
+      for(j = 0; j < ncells_per_colour[i]; j++){
+        matrix_vector_code_1D((cmap[i][j]-1), nlayers, data1, data2, ncell_3d, op_data_1D, ndf1, undf1, map1, ndf2, undf2, map2);
+      }
     }
   }
   end = omp_get_wtime();
