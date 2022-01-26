@@ -22,6 +22,7 @@ typedef struct{
 } dino_type;
 
 void dino_open(dino_type *dino);
+void dino_open_fn(dino_type *dino, char *fn);
 void dino_close(dino_type *dino);
 
 void input_scalar(dino_type *dino, int *scalar);

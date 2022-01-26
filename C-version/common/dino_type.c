@@ -18,6 +18,20 @@ void dino_open(dino_type *dino){
   return;
 }
 
+
+void dino_open_fn(dino_type *dino, char *fn){
+  int fp_s;
+  strcpy(dino->fn,fn);
+  dino->fp = fopen(dino->fn,"r");
+  if(!dino->fp){
+    fprintf(stderr,"Error: file not opened ...\n");
+    fprintf(stderr,"%s \n",dino->fn);
+    fprintf(stderr,"%d\n",dino->fp);
+    exit(1);
+  }
+  return;
+}
+
 void dino_close(dino_type *dino){
   fclose(dino->fp);
 }
