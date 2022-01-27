@@ -80,7 +80,7 @@ int main(){
 
   /* read the answer */
   input_1d_double(&dino, answer, undf);
-  printf("final answer: %lf\n",answer[undf-1]);
+  printf("final answer, yeah: %lf\n",answer[undf-1]);
   
   
   return 0;
