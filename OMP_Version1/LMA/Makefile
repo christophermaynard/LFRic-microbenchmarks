@@ -5,12 +5,13 @@
 #!-----------------------------------------------------------------------------
 
 
-CC=gcc
+CC=clang
 IPATH=../common
 VPATH=$(IPATH):.
 
 
-CFLAGS=-I$(IPATH) -g -O3 -fopenmp
+CFLAGS=-I$(IPATH) -g -O3 -march=cascadelake  -fno-cray-openmp -fopenmp=libomp
+
 
 
 LDFLAGS=
