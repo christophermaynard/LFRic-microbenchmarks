@@ -33,7 +33,7 @@ void matrix_vector_code_1D(int cell, int nlayers, double* lhs, double *x, int nc
 
            for(df1 = 0; df1<ndf1; df1++){
               for(df2=0; df2<ndf2; df2++){
-                        for(k = 0; k < nlayers; k+= 4){
+                        for(k = 0; k < nlayers; k+= 8){
                                 ik = cell*nlayers+k;
                   kk = k-1;
 
