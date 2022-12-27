@@ -30,9 +30,11 @@ module dino_mod
      generic   :: output_scalar => output_integer, output_real
      generic   :: input_scalar => input_integer, input_real
      generic   :: output_array => output_2d_integer_array, output_1d_real_array, &
-                                  output_3d_real_array, output_1d_integer_array
+                                  output_3d_real_array, output_1d_integer_array, &
+                                  output_4d_integer_array
      generic   :: input_array => input_2d_integer_array, input_1d_real_array, &
-                                 input_3d_real_array, input_1d_integer_array
+                                 input_3d_real_array, input_1d_integer_array, &
+                                 input_4d_integer_array
      procedure :: output_integer
      procedure :: output_real
      procedure :: input_integer
@@ -40,13 +42,16 @@ module dino_mod
      procedure :: io_close
      procedure :: output_2d_integer_array
      procedure :: input_2d_integer_array
+     procedure :: output_4d_integer_array
+     procedure :: input_4d_integer_array     
      procedure :: output_1d_integer_array
      procedure :: output_1d_real_array
      procedure :: input_1d_real_array
      procedure :: output_3d_real_array
      procedure :: input_3d_real_array
      procedure :: input_1d_integer_array
-     final     :: dino_destructor
+     !!     final     :: dino_destructor
+     procedure :: dino_destructor     
 
   end type dino_type
 
@@ -109,7 +114,6 @@ contains
     integer(kind=i_def),                         intent(in)  :: dim2
     integer(kind=i_def),                         intent(in)  :: dim3
     real(kind=r_def), dimension(dim1,dim2,dim3), intent(out) :: array
-    integer :: i,j,k
     if(.not.self%file_is_open) then
        write(*,'(A)') "output_integer:Shriek, file not open"
        stop 1
@@ -204,20 +208,65 @@ contains
   !> subroutine to read in a 2d integer array
   !> @param array integer 2d array
   !> @param dim1 integer size of dimension 1
-  !> @param dim2 integer size of dimension 2
+  !> @param dim2 integer size of dimension 2 
   subroutine input_2d_integer_array(self, array, dim1, dim2)
     implicit none
-    class(dino_type),                           intent(in)  :: self
+    class(dino_type),                          intent(in)  :: self
     integer(kind=i_def),                       intent(in)  :: dim1
     integer(kind=i_def),                       intent(in)  :: dim2
     integer(kind=i_def), dimension(dim1,dim2), intent(out) :: array
     if(.not.self%file_is_open) then
-       write(*,'(A)') "output_integer:Shriek, file not open"
+       write(*,'(A)') "proflib_io:input_2d_integer_array:Shriek, file not open"
        stop 1
     end if
     read(self%file_handle,*) array
 
   end subroutine input_2d_integer_array
+
+    !> subroutine to read in a 4d integer array
+  !> @param array integer 4d array
+  !> @param dim1 integer size of dimension 1
+  !> @param dim2 integer size of dimension 2 
+  !> @param dim3 integer size of dimension 3
+  !> @param dim4 integer size of dimension 4  
+  subroutine input_4d_integer_array(self, array, dim1, dim2, dim3, dim4)
+    implicit none
+    class(dino_type),                          intent(in)  :: self
+    integer(kind=i_def),                       intent(in)  :: dim1
+    integer(kind=i_def),                       intent(in)  :: dim2
+    integer(kind=i_def),                       intent(in)  :: dim3
+    integer(kind=i_def),                       intent(in)  :: dim4
+    integer(kind=i_def), dimension(dim1,dim2,dim3,dim4), intent(out) :: array
+    if(.not.self%file_is_open) then
+       write(*,'(A)') "proflib_io:input_4d_integer_array:Shriek, file not open"
+       stop 1
+    end if
+    read(self%file_handle,*) array
+
+  end subroutine input_4d_integer_array
+
+  !> subroutine to write out a 4d integer array
+  !> @param array integer 4d array
+  !> @param dim1 integer size of dimension 1
+  !> @param dim2 integer size of dimension 2
+  !> @param dim3 integer size of dimension 3
+  !> @param dim4 integer size of dimension 4  
+  subroutine output_4d_integer_array(self, array, dim1, dim2, dim3, dim4)
+    implicit none
+    class(dino_type),                          intent(in) :: self
+    integer(kind=i_def),                       intent(in) :: dim1
+    integer(kind=i_def),                       intent(in) :: dim2
+    integer(kind=i_def),                       intent(in) :: dim3
+    integer(kind=i_def),                       intent(in) :: dim4    
+    integer(kind=i_def), dimension(dim1,dim2,dim3,dim4), intent(in) :: array
+    if(.not.self%file_is_open) then
+       write(*,'(A)') "io_proflib:output_4d_integer_array:Shriek, file not open"
+       stop 1
+    end if
+
+    write(self%file_handle,*) array
+
+  end subroutine output_4d_integer_array
 
   !> subroutine to write out an integer
   !> @param integer scalar
@@ -294,7 +343,7 @@ contains
   !> Finalizer, which closes the file if still open
   subroutine dino_destructor(self)
     implicit none
-    type(dino_type), intent(inout) :: self
+    class(dino_type), intent(inout) :: self
     if(self%file_is_open) then
        close(self%file_handle)
        self%file_is_open=.false.
