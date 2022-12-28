@@ -15,15 +15,15 @@
 !>          (k+1, k+2, k-1, k-2) respectively.
 module apply_helmholtz_operator_kernel_mod
 
-!  use argument_mod,      only: arg_type,              &
-!                               GH_FIELD, GH_REAL,     &
-!                               GH_SCALAR, GH_LOGICAL, &
-!                               GH_READ, GH_WRITE,     &
-!                               STENCIL, CROSS2D,      &
-!                               CELL_COLUMN
-  use constants_mod,     only: r_def, i_def, l_def
-!  use fs_continuity_mod, only: W3
-!  use kernel_mod,        only: kernel_type
+  use argument_mod,      only: arg_type,              &
+                               GH_FIELD, GH_REAL,     &
+                               GH_SCALAR, GH_LOGICAL, &
+                               GH_READ, GH_WRITE,     &
+                               STENCIL, CROSS2D,      &
+                               CELL_COLUMN
+  use constants_mod,     only: r_solver, i_def, l_def
+  use fs_continuity_mod, only: W3
+  use kernel_mod,        only: kernel_type
 
   implicit none
 
@@ -32,18 +32,18 @@ module apply_helmholtz_operator_kernel_mod
   !---------------------------------------------------------------------------
   ! Public types
   !---------------------------------------------------------------------------
-!  type, public, extends(kernel_type) :: apply_helmholtz_operator_kernel_type
-!    private
-!    type(arg_type) :: meta_args(4) = (/                                    &
-!         arg_type(GH_FIELD,   GH_REAL,    GH_WRITE, W3),                   &
-!         arg_type(GH_FIELD,   GH_REAL,    GH_READ,  W3, STENCIL(CROSS2D)), &
-!         arg_type(GH_FIELD*9, GH_REAL,    GH_READ,  W3),                   &
-!         arg_type(GH_SCALAR,  GH_LOGICAL, GH_READ)                         &
-!         /)
-!    integer :: operates_on = CELL_COLUMN
-!  contains
-!    procedure, nopass :: apply_helmholtz_operator_code
-!  end type apply_helmholtz_operator_kernel_type
+  type, public, extends(kernel_type) :: apply_helmholtz_operator_kernel_type
+    private
+    type(arg_type) :: meta_args(4) = (/                                    &
+         arg_type(GH_FIELD,   GH_REAL,    GH_WRITE, W3),                   &
+         arg_type(GH_FIELD,   GH_REAL,    GH_READ,  W3, STENCIL(CROSS2D)), &
+         arg_type(GH_FIELD*9, GH_REAL,    GH_READ,  W3),                   &
+         arg_type(GH_SCALAR,  GH_LOGICAL, GH_READ)                         &
+         /)
+    integer :: operates_on = CELL_COLUMN
+  contains
+    procedure, nopass :: apply_helmholtz_operator_code
+  end type apply_helmholtz_operator_kernel_type
 
   !---------------------------------------------------------------------------
   ! Contained functions/subroutines
@@ -94,20 +94,20 @@ subroutine apply_helmholtz_operator_code(nlayers, &
   integer(kind=i_def), dimension(ndf),                intent(in) :: map
   integer(kind=i_def), dimension(ndf, max_length, 4), intent(in) :: smap
 
-  real(kind=r_def), dimension(undf), intent(inout) :: y
-  real(kind=r_def), dimension(undf), intent(in)    :: x
-  real(kind=r_def), dimension(undf), intent(in)    :: Helm_C,                           &
-                                                      Helm_N, Helm_E, Helm_S, Helm_W,   &
-                                                      Helm_U, Helm_UU, Helm_D, Helm_DD
+  real(kind=r_solver), dimension(undf), intent(inout) :: y
+  real(kind=r_solver), dimension(undf), intent(in)    :: x
+  real(kind=r_solver), dimension(undf), intent(in)    :: Helm_C,                           &
+                                                         Helm_N, Helm_E, Helm_S, Helm_W,   &
+                                                         Helm_U, Helm_UU, Helm_D, Helm_DD
 
   integer(kind=i_def) :: k, branch, cell
-  real(kind=r_def), dimension(max_length,4) :: coeff
+  real(kind=r_solver), dimension(max_length,4) :: coeff
 
   ! Coefficients on this layer
 
   if (limited_area) then
     ! Use a method that accounts for stencils at the edges of the mesh
-    coeff(1,:) = 0.0_r_def
+    coeff(1,:) = 0.0_r_solver
     do k = 0, nlayers-1
       coeff(2,1) = Helm_W(map(1)+k)
       coeff(2,2) = Helm_S(map(1)+k)
@@ -126,77 +126,33 @@ subroutine apply_helmholtz_operator_code(nlayers, &
       end do
     end do
 
- else
+  else
     ! Use a more efficient method for the global
-    do k = 2,nlayers-3
-       y(map(1)+k) = Helm_C(map(1)+k)*x(smap(1,1,1)+k) &
-            + Helm_W(map(1)+k)*x(smap(1,2,1)+k) &
-            + Helm_S(map(1)+k)*x(smap(1,2,2)+k) &
-            + Helm_E(map(1)+k)*x(smap(1,2,3)+k) &
-            + Helm_N(map(1)+k)*x(smap(1,2,4)+k) &
-            + Helm_U(map(1)+k) *x(map(1)+k+1) &
-            + Helm_UU(map(1)+k)*x(map(1)+k+2) &
-            + Helm_D(map(1)+k)*x(map(1)+k-1) &
-            + Helm_DD(map(1)+k)*x(map(1)+k-2)    
+    do k = 0,nlayers-1
+      y(map(1)+k) = Helm_C(map(1)+k)*x(smap(1,1,1)+k) &
+                  + Helm_W(map(1)+k)*x(smap(1,2,1)+k) &
+                  + Helm_S(map(1)+k)*x(smap(1,2,2)+k) &
+                  + Helm_E(map(1)+k)*x(smap(1,2,3)+k) &
+                  + Helm_N(map(1)+k)*x(smap(1,2,4)+k)
     end do
 
- end if
+  end if
 
   ! Coefficients on layers above
-!  do k = 0,nlayers-3
-!    y(map(1)+k) = y(map(1)+k) &
-!            + Helm_U(map(1)+k) *x(map(1)+k+1) &
-!            + Helm_UU(map(1)+k)*x(map(1)+k+2) 
-!  end do
- k=0
- y(map(1)+k) = Helm_C(map(1)+k)*x(smap(1,1,1)+k) &
-            + Helm_W(map(1)+k)*x(smap(1,2,1)+k) &
-            + Helm_S(map(1)+k)*x(smap(1,2,2)+k) &
-            + Helm_E(map(1)+k)*x(smap(1,2,3)+k) &
-            + Helm_N(map(1)+k)*x(smap(1,2,4)+k) &
-            + Helm_U(map(1)+k) *x(map(1)+k+1) &
-            + Helm_UU(map(1)+k)*x(map(1)+k+2) 
- k=1
- y(map(1)+k) = Helm_C(map(1)+k)*x(smap(1,1,1)+k) &
-            + Helm_W(map(1)+k)*x(smap(1,2,1)+k) &
-            + Helm_S(map(1)+k)*x(smap(1,2,2)+k) &
-            + Helm_E(map(1)+k)*x(smap(1,2,3)+k) &
-            + Helm_N(map(1)+k)*x(smap(1,2,4)+k) &
-            + Helm_U(map(1)+k) *x(map(1)+k+1) &
-            + Helm_UU(map(1)+k)*x(map(1)+k+2) &
-            + Helm_D(map(1)+k)*x(map(1)+k-1)
-
- k = nlayers - 2
- y(map(1)+k) = Helm_C(map(1)+k)*x(smap(1,1,1)+k) &
-            + Helm_W(map(1)+k)*x(smap(1,2,1)+k) &
-            + Helm_S(map(1)+k)*x(smap(1,2,2)+k) &
-            + Helm_E(map(1)+k)*x(smap(1,2,3)+k) &
-            + Helm_N(map(1)+k)*x(smap(1,2,4)+k) &
-            + Helm_U(map(1)+k)*x(map(1)+k+1) &
-            + Helm_D(map(1)+k) *x(map(1)+k-1) &
-            + Helm_DD(map(1)+k)*x(map(1)+k-2)
-
- k = nlayers - 1
- y(map(1)+k) = Helm_C(map(1)+k)*x(smap(1,1,1)+k) &
-            + Helm_W(map(1)+k)*x(smap(1,2,1)+k) &
-            + Helm_S(map(1)+k)*x(smap(1,2,2)+k) &
-            + Helm_E(map(1)+k)*x(smap(1,2,3)+k) &
-            + Helm_N(map(1)+k)*x(smap(1,2,4)+k) &
-            + Helm_D(map(1)+k) *x(map(1)+k-1) &
-            + Helm_DD(map(1)+k)*x(map(1)+k-2)
-
-
-! the missing bits
-!  k = nlayers - 2
-!  y(map(1)+k) = y(map(1)+k) + Helm_U(map(1)+k)*x(map(1)+k+1)
+  do k = 0,nlayers-3
+    y(map(1)+k) = y(map(1)+k) + Helm_U(map(1)+k) *x(map(1)+k+1) &
+                              + Helm_UU(map(1)+k)*x(map(1)+k+2)
+  end do
+  k = nlayers - 2
+  y(map(1)+k) = y(map(1)+k) + Helm_U(map(1)+k)*x(map(1)+k+1)
 
   ! Coefficients on layers below
-!  k = 1
-!  y(map(1)+k) = y(map(1)+k) + Helm_D(map(1)+k)*x(map(1)+k-1)
-!  do k = 2,nlayers-1
-!    y(map(1)+k) = y(map(1)+k) + Helm_D(map(1)+k) *x(map(1)+k-1) &
-!                              + Helm_DD(map(1)+k)*x(map(1)+k-2)
-!  end do
+  k = 1
+  y(map(1)+k) = y(map(1)+k) + Helm_D(map(1)+k)*x(map(1)+k-1)
+  do k = 2,nlayers-1
+    y(map(1)+k) = y(map(1)+k) + Helm_D(map(1)+k) *x(map(1)+k-1) &
+                              + Helm_DD(map(1)+k)*x(map(1)+k-2)
+  end do
 
 end subroutine apply_helmholtz_operator_code
 
