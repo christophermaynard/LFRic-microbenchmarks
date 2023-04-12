@@ -9,6 +9,8 @@ program lma_driver
   use matrix_vector_kernel_mod, only: matrix_vector_code
   use dino_mod, only : dino_type
   use compare_mod, only : compare
+
+  use omp_lib
   implicit none
   
   ! mesh sizes
@@ -34,6 +36,7 @@ program lma_driver
   real(kind=r_def), allocatable, dimension(:,:,:) :: op_data    
 
   type(dino_type) :: dino
+  real(kind=r_def) :: omp_start, omp_end
 
   ! loop counters
   integer(kind=i_def) :: colour, cell
@@ -77,11 +80,9 @@ program lma_driver
   call dino%input_array(data2, undf2)
   call dino%input_array(answer, undf1)
 
-  !  write(*,'(A)') "lma_driver:ingested dinodump",ndf1,ndf2
-  write(*,*) "lma_driver:ingested dinodump",ndf1,ndf2  
-  !
-  ! Repeat the work 1000 times to hide the cost of reading the data.
-!  do count =1 , 1000 
+  write(*,'(A,I2," ",I2)') "lma_driver:ingested dinodump, sizes:",ndf1,ndf2
+
+  ! run once and check correctness
   do colour=1, ncolours
   !$omp parallel default(shared), private(cell)
   !$omp do schedule(static)
@@ -93,12 +94,29 @@ program lma_driver
   !$omp end do
   !$omp end parallel
   end do
-!end do
-
   write(*,'(A)') "lma_driver:Kernel run, checking answer ..."
-  !check the answer
   count = compare(data1, answer, undf1, .false. )
   write(*,'(A,I6,A,I6,A)') "lma_driver:checked ",undf1," answers, found ",count, " errors" 
+
+  write(*,'(A)') "lma_driver:Running 1000 times, with timing ..."
+  
+  omp_start = omp_get_wtime()
+  !
+  do count =1 , 1000
+     do colour=1, ncolours
+        !$omp parallel default(shared), private(cell)
+        !$omp do schedule(static)
+        do cell=1,ncells_per_colour(colour)
+           call matrix_vector_code(cmap(colour,cell), nlayers, data1, data2, &
+                ncell_3d, op_data, ndf1, undf1, map1(:,cmap(colour,cell)), &
+                ndf2, undf2, map2(:,cmap(colour,cell)) )
+        end do
+        !$omp end do
+        !$omp end parallel
+     end do
+  end do
+  omp_end = omp_get_wtime()
+  write(*,'(A,F8.4,A)') "lma_driver:kernel 1000 x run-time is:",omp_end-omp_start," seconds"
   
   ! deallocate the arrays
   deallocate(ncells_per_colour, cmap)
