@@ -4,8 +4,9 @@ program helmholtz_driver
   USE apply_helmholtz_operator_kernel_mod, ONLY: apply_helmholtz_operator_code
   use dino_mod, only: dino_type
   use compare_mod, only : compare
+  use omp_lib
   
-  IMPLICIT NONE  
+  implicit none  
       
   real(kind=r_def), allocatable, dimension(:) :: y_vec, x_vec, ans
 
@@ -23,7 +24,7 @@ program helmholtz_driver
   INTEGER(KIND=i_def) loop0_start, loop0_stop
   INTEGER(KIND=i_def) nlayers
 
-  integer(kind=i_def) :: dummy, count
+  integer(kind=i_def) :: count, lc_count
   
   INTEGER(KIND=i_def), allocatable, dimension(:,:) :: map_w3
   INTEGER(KIND=i_def) :: ndf_w3, undf_w3
@@ -31,6 +32,9 @@ program helmholtz_driver
   INTEGER(KIND=i_def), allocatable, dimension(:,:) :: x_vec_stencil_size
   INTEGER(KIND=i_def), allocatable, dimension(:,:,:,:) :: x_vec_stencil_dofmap
   type(dino_type) :: steggy
+
+  real(kind=r_def) :: omp_start, omp_end
+  real(kind=r_def) :: tol=1.0e-9
   !
   steggy = dino_type()
       !
@@ -80,10 +84,8 @@ program helmholtz_driver
   write(*,*) "helmholtz_driver:ingested dinodump"  
   call steggy%dino_destructor()
 
-  do dummy = 1, 1000
-  
-!  !$omp parallel default(shared), private(cell)
-!  !$omp do schedule(static)
+  !$omp parallel default(shared), private(cell)
+  !$omp do schedule(static)
   DO cell=loop0_start,loop0_stop
      
      CALL apply_helmholtz_operator_code(nlayers, y_vec, x_vec, x_vec_stencil_size(:,cell), &
@@ -93,13 +95,38 @@ program helmholtz_driver
           &helmholtz_operator9, .false., ndf_w3, undf_w3, map_w3(:,cell))
      
   END DO
-!  !$omp end do
-!  !$omp end parallel
-end do
+  !$omp end do
+  !$omp end parallel
 
   write(*,'(A)') "helmholtz_driver:Kernel run, checking answer ..."
   !check the answer
-  count = compare(y_vec, ans, undf_w3, .false.)
-  write(*,'(A,I6,A,I6,A)') "helmholtz_driver:checked ",undf_w3," answers, found ",count, " errors" 
+  count = compare(y_vec, ans, undf_w3, .false., tol)
+  write(*,'(A,I6,A,I6,A)') "helmholtz_driver:checked ",undf_w3," answers, found ",count, " errors"
+
+  write(*,'(A)') "helmholtz_driver:Running 1000 times, with timing ..."
+  omp_start = omp_get_wtime()
+  !
+  do lc_count =1 , 10000
+     !$omp parallel default(shared), private(cell)
+     !$omp do schedule(static)
+     DO cell=loop0_start,loop0_stop
+     
+        CALL apply_helmholtz_operator_code(nlayers, y_vec, x_vec, x_vec_stencil_size(:,cell), &
+             &x_vec_max_branch_length, x_vec_stencil_dofmap(:,:,:,cell), helmholtz_operator1, helmholtz_operator2, &
+             &helmholtz_operator3, helmholtz_operator4, helmholtz_operator5, &
+             &helmholtz_operator6, helmholtz_operator7, helmholtz_operator8, &
+             &helmholtz_operator9, .false., ndf_w3, undf_w3, map_w3(:,cell))
+     
+     END DO
+     !$omp end do
+     !$omp end parallel
+
+  end do
+
+  omp_end = omp_get_wtime()
+  write(*,'(A,F8.4,A)') "helmholtz_driver:kernel 1000 x run-time is:",omp_end-omp_start," seconds" 
+
+
   
 END program helmholtz_driver
+

@@ -15,14 +15,7 @@
 !>          (k+1, k+2, k-1, k-2) respectively.
 module apply_helmholtz_operator_kernel_mod
 
-  use argument_mod,      only: arg_type,              &
-                               GH_FIELD, GH_REAL,     &
-                               GH_SCALAR, GH_LOGICAL, &
-                               GH_READ, GH_WRITE,     &
-                               STENCIL, CROSS2D,      &
-                               CELL_COLUMN
   use constants_mod,     only: r_solver, i_def, l_def
-  use fs_continuity_mod, only: W3
   use kernel_mod,        only: kernel_type
 
   implicit none
@@ -34,13 +27,6 @@ module apply_helmholtz_operator_kernel_mod
   !---------------------------------------------------------------------------
   type, public, extends(kernel_type) :: apply_helmholtz_operator_kernel_type
     private
-    type(arg_type) :: meta_args(4) = (/                                    &
-         arg_type(GH_FIELD,   GH_REAL,    GH_WRITE, W3),                   &
-         arg_type(GH_FIELD,   GH_REAL,    GH_READ,  W3, STENCIL(CROSS2D)), &
-         arg_type(GH_FIELD*9, GH_REAL,    GH_READ,  W3),                   &
-         arg_type(GH_SCALAR,  GH_LOGICAL, GH_READ)                         &
-         /)
-    integer :: operates_on = CELL_COLUMN
   contains
     procedure, nopass :: apply_helmholtz_operator_code
   end type apply_helmholtz_operator_kernel_type
@@ -49,7 +35,7 @@ module apply_helmholtz_operator_kernel_mod
   ! Contained functions/subroutines
   !---------------------------------------------------------------------------
   public :: apply_helmholtz_operator_code
-
+ 
 contains
 
 !> @brief Apply the Helmholtz operator when stored as a stencil of coefficients
@@ -93,7 +79,6 @@ subroutine apply_helmholtz_operator_code(nlayers, &
 
   integer(kind=i_def), dimension(ndf),                intent(in) :: map
   integer(kind=i_def), dimension(ndf, max_length, 4), intent(in) :: smap
-
   real(kind=r_solver), dimension(undf), intent(inout) :: y
   real(kind=r_solver), dimension(undf), intent(in)    :: x
   real(kind=r_solver), dimension(undf), intent(in)    :: Helm_C,                           &
@@ -152,7 +137,7 @@ subroutine apply_helmholtz_operator_code(nlayers, &
   do k = 2,nlayers-1
     y(map(1)+k) = y(map(1)+k) + Helm_D(map(1)+k) *x(map(1)+k-1) &
                               + Helm_DD(map(1)+k)*x(map(1)+k-2)
-  end do
+ end do
 
 end subroutine apply_helmholtz_operator_code
 
