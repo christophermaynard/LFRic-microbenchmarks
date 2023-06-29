@@ -15,14 +15,8 @@
 !>          (k+1, k+2, k-1, k-2) respectively.
 module apply_helmholtz_operator_kernel_mod
 
-  use argument_mod,      only: arg_type,              &
-                               GH_FIELD, GH_REAL,     &
-                               GH_SCALAR, GH_LOGICAL, &
-                               GH_READ, GH_WRITE,     &
-                               STENCIL, CROSS2D,      &
-                               CELL_COLUMN
+ 
   use constants_mod,     only: r_solver, i_def, l_def
-  use fs_continuity_mod, only: W3
   use kernel_mod,        only: kernel_type
 
   implicit none
@@ -34,13 +28,7 @@ module apply_helmholtz_operator_kernel_mod
   !---------------------------------------------------------------------------
   type, public, extends(kernel_type) :: apply_helmholtz_operator_kernel_type
     private
-    type(arg_type) :: meta_args(4) = (/                                    &
-         arg_type(GH_FIELD,   GH_REAL,    GH_WRITE, W3),                   &
-         arg_type(GH_FIELD,   GH_REAL,    GH_READ,  W3, STENCIL(CROSS2D)), &
-         arg_type(GH_FIELD*9, GH_REAL,    GH_READ,  W3),                   &
-         arg_type(GH_SCALAR,  GH_LOGICAL, GH_READ)                         &
-         /)
-    integer :: operates_on = CELL_COLUMN
+
   contains
     procedure, nopass :: apply_helmholtz_operator_code
   end type apply_helmholtz_operator_kernel_type

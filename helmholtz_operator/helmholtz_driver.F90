@@ -31,6 +31,7 @@ program helmholtz_driver
   INTEGER(KIND=i_def), allocatable, dimension(:,:) :: x_vec_stencil_size
   INTEGER(KIND=i_def), allocatable, dimension(:,:,:,:) :: x_vec_stencil_dofmap
   type(dino_type) :: steggy
+  real(kind=r_def) :: tol=1.0e-9
   !
   steggy = dino_type()
       !
@@ -99,7 +100,7 @@ end do
 
   write(*,'(A)') "helmholtz_driver:Kernel run, checking answer ..."
   !check the answer
-  count = compare(y_vec, ans, undf_w3, .false.)
+  count = compare(y_vec, ans, undf_w3, .false., tol)
   write(*,'(A,I6,A,I6,A)') "helmholtz_driver:checked ",undf_w3," answers, found ",count, " errors" 
   
 END program helmholtz_driver
